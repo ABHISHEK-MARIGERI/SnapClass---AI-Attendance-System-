@@ -1,6 +1,9 @@
 # Python cache
 __pycache__/
 *.py[cod]
+*.__pyc
+.DS_store
+dict/
 
 # Virtual environment
 venv/
