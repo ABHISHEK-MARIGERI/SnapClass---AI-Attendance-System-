@@ -10,7 +10,7 @@ from src.database.db import get_all_students
 ##########################################################################################
 #Load all the dlib models used in face_recognition pipeline 
 
-@st.cache_resources
+@st.cache_resource
 def load_dlib_models():
     detector = dlib.get_frontal_face_detector()
 
@@ -26,8 +26,7 @@ def load_dlib_models():
          face_recognition_models.face_recognition_model_location()
     )
 
-    return
-    detector, sp, facerec
+    return detector, sp, facerec
 
 ###############################################################################################
 #Generate embeddings for each student face detected 
@@ -70,19 +69,19 @@ def get_trained_model():
         return 0 
 
 
-    clf = SVC(kernal='linear' , probability=True , class_weight='balanced')
+    clf = SVC(kernel='linear' , probability=True , class_weight='balanced')
 
     try:
         clf.fit(X,y)
     except ValueError:
         pass 
 
-    return {'clf':clf ,'X':x, "y":y} 
+    return {'clf':clf ,'X':X, "y":y} 
 
 #########################################################################################################
 # Retrain the classifier whenever a new student is added.
 
-def tarin_classifier():
+def train_classifier():
     st.cache_resource.clear()
     model_data = get_trained_model()
     return bool(model_data)
