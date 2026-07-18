@@ -17,3 +17,8 @@ segno
 pillow
 
 streamlit
+
+
+#Voise recognition
+librosa
+resemblyzer
