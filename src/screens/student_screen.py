@@ -4,21 +4,17 @@ from src.ui.base_layout import style_background_dashboard, style_base_layout
 
 from src.components.header import header_dashboard
 from src.components.footer import footer_dashboard
-
 from PIL import Image
 import numpy as np
-
 from src.pipelines.face_pipeline import predict_attendance, get_face_embeddings, train_classifier
 from src.pipelines.voice_pipeline import get_voice_embedding
-
-from src.database.db import get_all_students, create_student 
+from src.database.db import get_all_students, create_student, get_student_subjects, get_student_attendance, unenroll_student_to_subject
 import time
 
 from src.components.dialog_enroll import enroll_dialog
-
-from src.database.db import get_all_students, create_student, get_student_subjects, get_student_attendance, unenroll_student_to_subject
 from src.components.subject_card import subject_card
 
+#####################################################################################################################################
 
 def student_dashboard():
     student_data = st.session_state.student_data
@@ -30,22 +26,21 @@ def student_dashboard():
         st.subheader(f"""Welcome, {student_data['name']} """)
         if st.button("Logout", type='secondary', key='loginbackbtn', shortcut="control+backspace"):
             st.session_state['is_logged_in'] = False
-            del st.session_state.teacher_data 
+            del st.session_state.student_data 
             st.rerun()
 
 
     st.space()
 
-    c1,c2 = st.columns(2)
+    c1, c2 =st.columns(2)
     with c1:
-        st.header("Your Enrolled Subjects")
+        st.header('Your Enrolled Subjects')
     with c2:
-        if st.button("Enroll in Subjects", type="primary", width='stretch'):
+        if st.button('Enroll in Subject', type='primary', width='stretch'):
             enroll_dialog()
 
 
-    st.divider() 
-
+    st.divider()
 
 
     with st.spinner('Loading your enrolled subjects..'):
@@ -91,15 +86,14 @@ def student_dashboard():
                 ],
                 footer_callback=unenroll_button
             )
-
     footer_dashboard()
 
 
-
-###################################################################################################################################
-
+##########################################################################################################################
 
 def student_screen():
+
+
     style_background_dashboard()
     style_base_layout()
 
@@ -107,56 +101,52 @@ def student_screen():
     if "student_data" in st.session_state:
         student_dashboard()
         return
-
-
-    c1, c2 = st.columns(2, vertical_alignment='center', gap='xxlarge')
     
+    c1, c2 = st.columns(2, vertical_alignment='center', gap='xxlarge')
     with c1:
         header_dashboard()
-    
     with c2:
-        if st.button("Go back to Home",type="secondary",key='loginbackbtn',shortcut="control+backspace"):
+        if st.button("Go back to Home", type='secondary', key='loginbackbtn', shortcut="control+backspace"):
             st.session_state['login_type'] = None
             st.rerun()
+
+    st.header('Login using FaceID', text_alignment='center')
+    st.space()
+    st.space()
     
-    st.header('Login using faceID', text_alignment='center')
-    st.space()
-    st.space()
+    show_registration = False
+    photo_source = st.camera_input("Position your face in the center")
 
-
-    show_registration =False
-
-    photo_source=st.camera_input("Position your face in the center")
     if photo_source:
-       img = np.array(Image.open(photo_source))
+        img = np.array(Image.open(photo_source))
 
-       with st.spinner("Ai is scanning.."):
-           detected , all_ids , num_faces = predict_attendance(img)
+        with st.spinner('AI is scanning..'):
+            detected, all_ids, num_faces = predict_attendance(img)
 
-           if num_faces == 0:
-                st.warning("face not found!")
-           elif num_faces > 1:
-               st.waring("Multiple faces detected")
-           else:
-               if detected:
-                   student_id = list(detected.keys())[0]
-                   all_students = get_all_students()
-                   student = next((s for s in all_students if s['student_id']==student_id),None)
+            if num_faces == 0:
+                st.warning('Face not found!')
+            elif num_faces >1:
+                st.warning('Multiple faces found')
+            else:
+                if detected:
+                    student_id = list(detected.keys())[0]
+                    all_students = get_all_students()
+                    student = next((s for s in all_students if s['student_id']==student_id), None)
 
-                   if student:
+                    if student:
                         st.session_state.is_logged_in = True
                         st.session_state.user_role = 'student'
                         st.session_state.student_data = student
-                        st.toast(f"Welcome Back {student['name']}")
+                        st.toast(f'Welcome Back {student['name']}')
                         time.sleep(1)
                         st.rerun()
-               else:
-                   st.info('Face is not recognized! You might be a new student!')
-                   show_registration =True     
+                else:
+                    st.info('Face not recognized! You might be a new student!')
+                    show_registration = True
     if show_registration:
         with st.container(border=True):
             st.header('Register new Profile')
-            new_name = st.text_input("Enter your name", placeholder='E.g. Abhishek ')
+            new_name = st.text_input("Enter your name", placeholder='E.g. Hamza Rizvi')
 
             st.subheader('Optional : Voice Enrollment')
             st.info("Enroll your for voice only attendance")
@@ -165,7 +155,7 @@ def student_screen():
             audio_data = None
 
             try:
-                audio_data = st.audio_input('Record a short phrase like I am present, My name is Abhishek.')
+                audio_data = st.audio_input('Record a short phrase like I am present, My name is Akash.')
             except Exception:
                 st.error('Audio Data failed!')
 
@@ -198,5 +188,5 @@ def student_screen():
                     st.warning('Please enter your name!')
 
 
+        
     footer_dashboard()
-
