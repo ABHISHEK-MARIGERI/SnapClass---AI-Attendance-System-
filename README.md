@@ -40,10 +40,10 @@ The system enables teachers to create and manage subjects, share QR codes for en
 
 | Application | Link |
 |-------------|------|
-| 🌐 Landing Page | **Coming Soon** |
-| 🎯 Streamlit App | **Coming Soon** |
+| 🌐 Landing Page |https://snap-class-landing-page-bice.vercel.app/ |
+| 🎯 Streamlit App | https://snapclass-7696-main.streamlit.app/ |
 
-> Replace the links above with your deployed **Vercel** and **Streamlit Cloud** URLs.
+
 
 ---
 
